@@ -5,10 +5,5 @@ mediapipe/MediaPipe.tulsiproj/*.tulsiconf-user
 mediapipe/provisioning_profile.mobileprovision
 .configure.bazelrc
 .user.bazelrc
-*.egg-info
-**/__pycache__/
 .DS_Store
 .idea
-.vscode
-
-/abseil-cpp
