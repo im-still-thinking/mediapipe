@@ -7,3 +7,5 @@ mediapipe/provisioning_profile.mobileprovision
 .user.bazelrc
 .DS_Store
 .idea
+.vscode
+/venv
