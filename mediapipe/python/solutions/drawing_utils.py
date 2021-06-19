@@ -116,6 +116,17 @@ def draw_detection(
   cv2.rectangle(image, rect_start_point, rect_end_point,
                 bbox_drawing_spec.color, bbox_drawing_spec.thickness)
 
+  # Puts Labels to detected objects if exists.              
+  if not detection.label or not rect_start_point:
+        return
+  cv2.putText(img=image,
+              text=str(detection.label)[2:-2],
+              org=(rect_start_point[0], rect_start_point[1] - 10),
+              fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+              fontScale=0.9,
+              color=bbox_drawing_spec.color,
+              thickness=bbox_drawing_spec.thickness)
+
 
 def draw_landmarks(
     image: np.ndarray,

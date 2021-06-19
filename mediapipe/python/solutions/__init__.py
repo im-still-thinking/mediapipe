@@ -23,6 +23,7 @@ import mediapipe.python.solutions.face_mesh_connections
 import mediapipe.python.solutions.hands
 import mediapipe.python.solutions.hands_connections
 import mediapipe.python.solutions.holistic
+import mediapipe.python.solutions.object_detection
 import mediapipe.python.solutions.objectron
 import mediapipe.python.solutions.pose
 import mediapipe.python.solutions.selfie_segmentation
