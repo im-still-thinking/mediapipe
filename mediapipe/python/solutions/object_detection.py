@@ -29,7 +29,6 @@ from mediapipe.calculators.tflite import ssd_anchors_calculator_pb2
 from mediapipe.calculators.tflite import tflite_tensors_to_detections_calculator_pb2
 from mediapipe.calculators.util import non_max_suppression_calculator_pb2
 from mediapipe.calculators.util import detection_label_id_to_text_calculator_pb2
-from mediapipe.calculators.util import detection_letter
 # pylint: enable=unused-import
 from mediapipe.python.solutions import download_utils
 from mediapipe.python.solution_base import SolutionBase
