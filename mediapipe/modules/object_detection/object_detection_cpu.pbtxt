@@ -38,6 +38,7 @@ node: {
 # Converts the transformed input image on CPU into an image tensor stored as a
 # TfLiteTensor.
 node {
+  name: "objectdetectioncpu__TfLiteConverterCalculator"
   calculator: "TfLiteConverterCalculator"
   input_stream: "IMAGE:transformed_image"
   output_stream: "TENSORS:image_tensor"
@@ -91,6 +92,7 @@ node {
 # the SSD anchors and the specification in the options, into a vector of
 # detections. Each detection describes a detected object.
 node {
+  name: "TfLiteTensorsToDetectionsCalculator"
   calculator: "TfLiteTensorsToDetectionsCalculator"
   input_stream: "TENSORS:detection_tensors"
   input_side_packet: "ANCHORS:anchors"
@@ -114,6 +116,7 @@ node {
 
 # Performs non-max suppression to remove excessive detections.
 node {
+  name: "NonMaxSuppressionCalculator"
   calculator: "NonMaxSuppressionCalculator"
   input_stream: "unfiltered_detections"
   output_stream: "filtered_detections"
