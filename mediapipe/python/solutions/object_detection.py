@@ -72,9 +72,9 @@ class ObjectDetection(SolutionBase):
             calculator_params={
                 'TfLiteTensorsToDetectionsCalculator.min_score_thresh':
                     min_detection_confidence,
-                'objectdetectioncpu__NonMaxSuppressionCalculator.min_suppression_threshold':
+                'NonMaxSuppressionCalculator.min_suppression_threshold':
                     min_suppression_threshold,
-                'objectdetectioncpu__NonMaxSuppressionCalculator.max_num_detections':
+                'NonMaxSuppressionCalculator.max_num_detections':
                     max_object_detection,
             },
             outputs=['detections'])

@@ -39,9 +39,11 @@ from mediapipe.framework.formats import detection_pb2
 from mediapipe.calculators.core import constant_side_packet_calculator_pb2
 from mediapipe.calculators.image import image_transformation_calculator_pb2
 from mediapipe.calculators.tensor import tensors_to_detections_calculator_pb2
+from mediapipe.calculators.tflite import tflite_tensors_to_detections_calculator_pb2
 from mediapipe.calculators.util import landmarks_smoothing_calculator_pb2
 from mediapipe.calculators.util import logic_calculator_pb2
 from mediapipe.calculators.util import thresholding_calculator_pb2
+from mediapipe.calculators.util import non_max_suppression_calculator_pb2
 from mediapipe.framework.formats import classification_pb2
 from mediapipe.framework.formats import landmark_pb2
 from mediapipe.framework.formats import rect_pb2
@@ -76,6 +78,12 @@ CALCULATOR_TO_OPTIONS = {
     'Lift2DFrameAnnotationTo3DCalculator':
         lift_2d_frame_annotation_to_3d_calculator_pb2
         .Lift2DFrameAnnotationTo3DCalculatorOptions,
+    'TfLiteTensorsToDetectionsCalculator':
+        tflite_tensors_to_detections_calculator_pb2
+        .TfLiteTensorsToDetectionsCalculatorOptions,
+    'NonMaxSuppressionCalculator':
+        non_max_suppression_calculator_pb2
+        .NonMaxSuppressionCalculatorOptions,
 }
 
 
