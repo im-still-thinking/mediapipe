@@ -1,4 +1,4 @@
-# Copyright 2021 The MediaPipe Authors.
+# Copyright 2020 The MediaPipe Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -6,11 +6,12 @@
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless requi_RED by applicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """MediaPipe solution drawing styles."""
 
 from typing import Mapping, Tuple
@@ -55,23 +56,28 @@ _PINKY_FINGER_LANDMARKS = (HandLandmark.PINKY_PIP, HandLandmark.PINKY_DIP,
                            HandLandmark.PINKY_TIP)
 _HAND_LANDMARK_STYLE = {
     _PALM_LANMARKS:
-        DrawingSpec(
-            color=_RED, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
+        DrawingSpec(color=_RED, thickness=_THICKNESS_DOT,
+                    circle_radius=_RADIUS),
     _THUMP_LANDMARKS:
-        DrawingSpec(
-            color=_PEACH, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
+        DrawingSpec(color=_PEACH,
+                    thickness=_THICKNESS_DOT,
+                    circle_radius=_RADIUS),
     _INDEX_FINGER_LANDMARKS:
-        DrawingSpec(
-            color=_PURPLE, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
+        DrawingSpec(color=_PURPLE,
+                    thickness=_THICKNESS_DOT,
+                    circle_radius=_RADIUS),
     _MIDDLE_FINGER_LANDMARKS:
-        DrawingSpec(
-            color=_YELLOW, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
+        DrawingSpec(color=_YELLOW,
+                    thickness=_THICKNESS_DOT,
+                    circle_radius=_RADIUS),
     _RING_FINGER_LANDMARKS:
-        DrawingSpec(
-            color=_GREEN, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
+        DrawingSpec(color=_GREEN,
+                    thickness=_THICKNESS_DOT,
+                    circle_radius=_RADIUS),
     _PINKY_FINGER_LANDMARKS:
-        DrawingSpec(
-            color=_BLUE, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
+        DrawingSpec(color=_BLUE,
+                    thickness=_THICKNESS_DOT,
+                    circle_radius=_RADIUS),
 }
 
 # Hands connections
@@ -190,10 +196,10 @@ def get_default_pose_landmarks_style() -> Mapping[int, DrawingSpec]:
       A mapping from each pose landmark to its default drawing spec.
   """
   pose_landmark_style = {}
-  left_spec = DrawingSpec(
-      color=(0, 138, 255), thickness=_THICKNESS_POSE_LANDMARKS)
-  right_spec = DrawingSpec(
-      color=(231, 217, 0), thickness=_THICKNESS_POSE_LANDMARKS)
+  left_spec = DrawingSpec(color=(0, 138, 255),
+                          thickness=_THICKNESS_POSE_LANDMARKS)
+  right_spec = DrawingSpec(color=(231, 217, 0),
+                           thickness=_THICKNESS_POSE_LANDMARKS)
   for landmark in _POSE_LANDMARKS_LEFT:
     pose_landmark_style[landmark] = left_spec
   for landmark in _POSE_LANDMARKS_RIGHT:
