@@ -18,75 +18,129 @@ from typing import Mapping, Tuple
 from mediapipe.python.solutions.hands import HandLandmark
 from mediapipe.python.solutions.drawing_utils import DrawingSpec
 
-RED = (54, 67, 244)
-GREEN = (118, 230, 0)
-BLUE = (192, 101, 21)
-YELLOW = (0, 204, 255)
-GRAY = (174, 164, 144)
-PURPLE = (251, 64, 224)
-PEACH = (180, 229, 255)
+_RADIUS = 5
+_RED = (54, 67, 244)
+_GREEN = (118, 230, 0)
+_BLUE = (192, 101, 21)
+_YELLOW = (0, 204, 255)
+_GRAY = (174, 164, 144)
+_PURPLE = (128, 64, 128)
+_PEACH = (180, 229, 255)
+
+# Hands
+_THICKNESS_WRIST_MCP = 3
+_THICKNESS_FINGER = 2
+_THICKNESS_DOT = -1
+
+# Hand landmarks
+_PALM_LANMARKS = (HandLandmark.WRIST, HandLandmark.THUMB_CMC,
+                  HandLandmark.INDEX_FINGER_MCP, HandLandmark.MIDDLE_FINGER_MCP,
+                  HandLandmark.RING_FINGER_MCP, HandLandmark.PINKY_MCP)
+_THUMP_LANDMARKS = (HandLandmark.THUMB_MCP, HandLandmark.THUMB_IP,
+                    HandLandmark.THUMB_TIP)
+_INDEX_FINGER_LANDMARKS = (HandLandmark.INDEX_FINGER_PIP,
+                           HandLandmark.INDEX_FINGER_DIP,
+                           HandLandmark.INDEX_FINGER_TIP)
+_MIDDLE_FINGER_LANDMARKS = (HandLandmark.MIDDLE_FINGER_PIP,
+                            HandLandmark.MIDDLE_FINGER_DIP,
+                            HandLandmark.MIDDLE_FINGER_TIP)
+_RING_FINGER_LANDMARKS = (HandLandmark.RING_FINGER_PIP,
+                          HandLandmark.RING_FINGER_DIP,
+                          HandLandmark.RING_FINGER_TIP)
+_PINKY_FINGER_LANDMARKS = (HandLandmark.PINKY_PIP, HandLandmark.PINKY_DIP,
+                           HandLandmark.PINKY_TIP)
+_HAND_LANDMARK_STYLE = {
+    _PALM_LANMARKS:
+        DrawingSpec(
+            color=_RED, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
+    _THUMP_LANDMARKS:
+        DrawingSpec(
+            color=_PEACH, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
+    _INDEX_FINGER_LANDMARKS:
+        DrawingSpec(
+            color=_PURPLE, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
+    _MIDDLE_FINGER_LANDMARKS:
+        DrawingSpec(
+            color=_YELLOW, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
+    _RING_FINGER_LANDMARKS:
+        DrawingSpec(
+            color=_GREEN, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
+    _PINKY_FINGER_LANDMARKS:
+        DrawingSpec(
+            color=_BLUE, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
+}
+
+# Hand connections
+_PALM_CONNECTIONS = ((HandLandmark.WRIST, HandLandmark.THUMB_CMC),
+                     (HandLandmark.WRIST, HandLandmark.INDEX_FINGER_MCP),
+                     (HandLandmark.MIDDLE_FINGER_MCP,
+                      HandLandmark.RING_FINGER_MCP),
+                     (HandLandmark.RING_FINGER_MCP, HandLandmark.PINKY_MCP),
+                     (HandLandmark.INDEX_FINGER_MCP,
+                      HandLandmark.MIDDLE_FINGER_MCP), (HandLandmark.WRIST,
+                                                        HandLandmark.PINKY_MCP))
+_THUMB_CONNECTIONS = ((HandLandmark.THUMB_CMC, HandLandmark.THUMB_MCP),
+                      (HandLandmark.THUMB_MCP, HandLandmark.THUMB_IP),
+                      (HandLandmark.THUMB_IP, HandLandmark.THUMB_TIP))
+_INDEX_FINGER_CONNECTIONS = ((HandLandmark.INDEX_FINGER_MCP,
+                              HandLandmark.INDEX_FINGER_PIP),
+                             (HandLandmark.INDEX_FINGER_PIP,
+                              HandLandmark.INDEX_FINGER_DIP),
+                             (HandLandmark.INDEX_FINGER_DIP,
+                              HandLandmark.INDEX_FINGER_TIP))
+_MIDDLE_FINGER_CONNECTIONS = ((HandLandmark.MIDDLE_FINGER_MCP,
+                               HandLandmark.MIDDLE_FINGER_PIP),
+                              (HandLandmark.MIDDLE_FINGER_PIP,
+                               HandLandmark.MIDDLE_FINGER_DIP),
+                              (HandLandmark.MIDDLE_FINGER_DIP,
+                               HandLandmark.MIDDLE_FINGER_TIP))
+_RING_FINGER_CONNECTIONS = ((HandLandmark.RING_FINGER_MCP,
+                             HandLandmark.RING_FINGER_PIP),
+                            (HandLandmark.RING_FINGER_PIP,
+                             HandLandmark.RING_FINGER_DIP),
+                            (HandLandmark.RING_FINGER_DIP,
+                             HandLandmark.RING_FINGER_TIP))
+_PINKY_FINGER_CONNECTIONS = ((HandLandmark.PINKY_MCP, HandLandmark.PINKY_PIP),
+                             (HandLandmark.PINKY_PIP, HandLandmark.PINKY_DIP),
+                             (HandLandmark.PINKY_DIP, HandLandmark.PINKY_TIP))
+_HAND_CONNECTION_STYLE = {
+    _PALM_CONNECTIONS:
+        DrawingSpec(color=_GRAY, thickness=_THICKNESS_WRIST_MCP),
+    _THUMB_CONNECTIONS:
+        DrawingSpec(color=_PEACH, thickness=_THICKNESS_FINGER),
+    _INDEX_FINGER_CONNECTIONS:
+        DrawingSpec(color=_PURPLE, thickness=_THICKNESS_FINGER),
+    _MIDDLE_FINGER_CONNECTIONS:
+        DrawingSpec(color=_YELLOW, thickness=_THICKNESS_FINGER),
+    _RING_FINGER_CONNECTIONS:
+        DrawingSpec(color=_GREEN, thickness=_THICKNESS_FINGER),
+    _PINKY_FINGER_CONNECTIONS:
+        DrawingSpec(color=_BLUE, thickness=_THICKNESS_FINGER)
+}
 
 
-def get_hand_landmark_connections_annotations() -> Tuple[Mapping[Tuple[int, int], DrawingSpec],
-                                                         Mapping[int, DrawingSpec]]:
-    """Provides styling data for annotations for hands detected on an RGB image.
+def get_default_hand_landmark_style() -> Mapping[int, DrawingSpec]:
+    """Returns the default hand landmark drawing style.
 
     Returns:
-      A Tuple object with a "connection_annotations" and "landmark_annotations" field 
-      that contains the styling data for hands detected.
+        A mapping from each hand landmark to the default drawing spec.
     """
+    hand_landmark_style = {}
+    for k, v in _HAND_LANDMARK_STYLE.items():
+        for landmark in k:
+            hand_landmark_style[landmark] = v
+    return hand_landmark_style
 
-    THICKNESS_WRIST_MCP = 3
-    THICKNESS_FINGER = 2
-    THICKNESS_DOT = -1
-    RADIUS = 5
 
-    connection_annotations = {
-        (HandLandmark.WRIST, HandLandmark.THUMB_CMC): DrawingSpec(color=GRAY, thickness=THICKNESS_WRIST_MCP),
-        (HandLandmark.THUMB_CMC, HandLandmark.THUMB_MCP): DrawingSpec(color=PEACH, thickness=THICKNESS_FINGER),
-        (HandLandmark.THUMB_MCP, HandLandmark.THUMB_IP): DrawingSpec(color=PEACH, thickness=THICKNESS_FINGER),
-        (HandLandmark.THUMB_IP, HandLandmark.THUMB_TIP): DrawingSpec(color=PEACH, thickness=THICKNESS_FINGER),
-        (HandLandmark.WRIST, HandLandmark.INDEX_FINGER_MCP): DrawingSpec(color=GRAY, thickness=THICKNESS_WRIST_MCP),
-        (HandLandmark.INDEX_FINGER_MCP, HandLandmark.INDEX_FINGER_PIP): DrawingSpec(color=PURPLE, thickness=THICKNESS_FINGER),
-        (HandLandmark.INDEX_FINGER_PIP, HandLandmark.INDEX_FINGER_DIP): DrawingSpec(color=PURPLE, thickness=THICKNESS_FINGER),
-        (HandLandmark.INDEX_FINGER_DIP, HandLandmark.INDEX_FINGER_TIP): DrawingSpec(color=PURPLE, thickness=THICKNESS_FINGER),
-        (HandLandmark.INDEX_FINGER_MCP, HandLandmark.MIDDLE_FINGER_MCP): DrawingSpec(color=GRAY, thickness=THICKNESS_WRIST_MCP),
-        (HandLandmark.MIDDLE_FINGER_MCP, HandLandmark.MIDDLE_FINGER_PIP): DrawingSpec(color=YELLOW, thickness=THICKNESS_FINGER),
-        (HandLandmark.MIDDLE_FINGER_PIP, HandLandmark.MIDDLE_FINGER_DIP): DrawingSpec(color=YELLOW, thickness=THICKNESS_FINGER),
-        (HandLandmark.MIDDLE_FINGER_DIP, HandLandmark.MIDDLE_FINGER_TIP): DrawingSpec(color=YELLOW, thickness=THICKNESS_FINGER),
-        (HandLandmark.MIDDLE_FINGER_MCP, HandLandmark.RING_FINGER_MCP): DrawingSpec(color=GRAY, thickness=THICKNESS_WRIST_MCP),
-        (HandLandmark.RING_FINGER_MCP, HandLandmark.RING_FINGER_PIP): DrawingSpec(color=GREEN, thickness=THICKNESS_FINGER),
-        (HandLandmark.RING_FINGER_PIP, HandLandmark.RING_FINGER_DIP): DrawingSpec(color=GREEN, thickness=THICKNESS_FINGER),
-        (HandLandmark.RING_FINGER_DIP, HandLandmark.RING_FINGER_TIP): DrawingSpec(color=GREEN, thickness=THICKNESS_FINGER),
-        (HandLandmark.RING_FINGER_MCP, HandLandmark.PINKY_MCP): DrawingSpec(color=GRAY, thickness=THICKNESS_WRIST_MCP),
-        (HandLandmark.WRIST, HandLandmark.PINKY_MCP): DrawingSpec(color=GRAY, thickness=THICKNESS_WRIST_MCP),
-        (HandLandmark.PINKY_MCP, HandLandmark.PINKY_PIP): DrawingSpec(color=BLUE, thickness=THICKNESS_FINGER),
-        (HandLandmark.PINKY_PIP, HandLandmark.PINKY_DIP): DrawingSpec(color=BLUE, thickness=THICKNESS_FINGER),
-        (HandLandmark.PINKY_DIP, HandLandmark.PINKY_TIP): DrawingSpec(color=BLUE, thickness=THICKNESS_FINGER)
-    }
+def get_default_hand_connection_style(
+) -> Mapping[Tuple[int, int], DrawingSpec]:
+    """Returns the default hand connection drawing style.
 
-    landmark_annotations = {
-        HandLandmark.WRIST: DrawingSpec(color=RED, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.THUMB_CMC: DrawingSpec(color=RED, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.THUMB_MCP: DrawingSpec(color=PEACH, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.THUMB_IP: DrawingSpec(color=PEACH, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.THUMB_TIP: DrawingSpec(color=PEACH, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.INDEX_FINGER_MCP: DrawingSpec(color=RED, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.INDEX_FINGER_PIP: DrawingSpec(color=PURPLE, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.INDEX_FINGER_DIP: DrawingSpec(color=PURPLE, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.INDEX_FINGER_TIP: DrawingSpec(color=PURPLE, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.MIDDLE_FINGER_MCP: DrawingSpec(color=RED, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.MIDDLE_FINGER_PIP: DrawingSpec(color=YELLOW, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.MIDDLE_FINGER_DIP: DrawingSpec(color=YELLOW, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.MIDDLE_FINGER_TIP: DrawingSpec(color=YELLOW, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.RING_FINGER_MCP: DrawingSpec(color=RED, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.RING_FINGER_PIP: DrawingSpec(color=GREEN, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.RING_FINGER_DIP: DrawingSpec(color=GREEN, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.RING_FINGER_TIP: DrawingSpec(color=GREEN, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.PINKY_MCP: DrawingSpec(color=RED, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.PINKY_PIP: DrawingSpec(color=BLUE, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.PINKY_DIP: DrawingSpec(color=BLUE, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-        HandLandmark.PINKY_TIP: DrawingSpec(color=BLUE, thickness=THICKNESS_DOT, circle_radius=RADIUS),
-    }
-
-    return (connection_annotations, landmark_annotations)
+    Returns:
+        A mapping from each hand connection to the default drawing spec.
+    """
+    hand_connection_style = {}
+    for k, v in _HAND_CONNECTION_STYLE.items():
+        for connection in k:
+            hand_connection_style[connection] = v
+    return hand_connection_style

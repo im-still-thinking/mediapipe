@@ -15,7 +15,7 @@
 """MediaPipe solution drawing utils."""
 
 import math
-from typing import List, Optional, Tuple, Union, Mapping
+from typing import List, Mapping, Optional, Tuple, Union
 
 import cv2
 import dataclasses
@@ -119,8 +119,12 @@ def draw_landmarks(
     image: np.ndarray,
     landmark_list: landmark_pb2.NormalizedLandmarkList,
     connections: Optional[List[Tuple[int, int]]] = None,
-    landmark_drawing_spec: Union[DrawingSpec, Mapping[int, DrawingSpec]] = DrawingSpec(color=RED_COLOR),
-    connection_drawing_spec: Union[DrawingSpec, Mapping[Tuple[int, int], DrawingSpec]] = DrawingSpec()):
+    landmark_drawing_spec: Union[DrawingSpec,
+                                 Mapping[int, DrawingSpec]] = DrawingSpec(
+                                     color=RED_COLOR),
+    connection_drawing_spec: Union[DrawingSpec,
+                                   Mapping[Tuple[int, int],
+                                           DrawingSpec]] = DrawingSpec()):
   """Draws the landmarks and the connections on the image.
 
   Args:
@@ -165,34 +169,35 @@ def draw_landmarks(
         raise ValueError(f'Landmark index is out of range. Invalid connection '
                          f'from landmark #{start_idx} to landmark #{end_idx}.')
       if start_idx in idx_to_coordinates and end_idx in idx_to_coordinates:
-        cv2.line(image,
-                 idx_to_coordinates[start_idx],
-                 idx_to_coordinates[end_idx],
-                 connection_drawing_spec[connection].color if isinstance(
-                    connection_drawing_spec, Mapping) else connection_drawing_spec.color,
-                 connection_drawing_spec[connection].thickness if isinstance(
-                    connection_drawing_spec, Mapping) else connection_drawing_spec.thickness)
+        if isinstance(connection_drawing_spec, Mapping):
+          cv2.line(image, idx_to_coordinates[start_idx],
+                   idx_to_coordinates[end_idx],
+                   connection_drawing_spec[connection].color,
+                   connection_drawing_spec[connection].thickness)
+        else:
+          cv2.line(image, idx_to_coordinates[start_idx],
+                   idx_to_coordinates[end_idx], connection_drawing_spec.color,
+                   connection_drawing_spec.thickness)
+
   # Draws landmark points after finishing the connection lines, which is
   # aesthetically better.
-  for idx ,landmark_px in idx_to_coordinates.items():
-    cv2.circle(image, 
-               landmark_px, 
-               landmark_drawing_spec[idx].circle_radius if isinstance(
-                    landmark_drawing_spec, Mapping) else landmark_drawing_spec.circle_radius,
-               landmark_drawing_spec[idx].color if isinstance(
-                    landmark_drawing_spec, Mapping) else landmark_drawing_spec.color, 
-               landmark_drawing_spec[idx].thickness if isinstance(
-                    landmark_drawing_spec, Mapping) else landmark_drawing_spec.thickness)
+  for idx, landmark_px in idx_to_coordinates.items():
+    if isinstance(landmark_drawing_spec, Mapping):
+      cv2.circle(image, landmark_px, landmark_drawing_spec[idx].circle_radius,
+                 landmark_drawing_spec[idx].color,
+                 landmark_drawing_spec[idx].thickness)
+    else:
+      cv2.circle(image, landmark_px, landmark_drawing_spec.circle_radius,
+                 landmark_drawing_spec.color, landmark_drawing_spec.thickness)
 
 
-def draw_axis(
-    image: np.ndarray,
-    rotation: np.ndarray,
-    translation: np.ndarray,
-    focal_length: Tuple[float, float] = (1.0, 1.0),
-    principal_point: Tuple[float, float] = (0.0, 0.0),
-    axis_length: float = 0.1,
-    axis_drawing_spec: DrawingSpec = DrawingSpec()):
+def draw_axis(image: np.ndarray,
+              rotation: np.ndarray,
+              translation: np.ndarray,
+              focal_length: Tuple[float, float] = (1.0, 1.0),
+              principal_point: Tuple[float, float] = (0.0, 0.0),
+              axis_length: float = 0.1,
+              axis_drawing_spec: DrawingSpec = DrawingSpec()):
   """Draws the 3D axis on the image.
 
   Args:
@@ -214,25 +219,24 @@ def draw_axis(
   image_rows, image_cols, _ = image.shape
   # Create axis points in camera coordinate frame.
   axis_world = np.float32([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
-  axis_cam = np.matmul(rotation, axis_length*axis_world.T).T + translation
+  axis_cam = np.matmul(rotation, axis_length * axis_world.T).T + translation
   x = axis_cam[..., 0]
   y = axis_cam[..., 1]
   z = axis_cam[..., 2]
   # Project 3D points to NDC space.
   fx, fy = focal_length
   px, py = principal_point
-  x_ndc = np.clip(-fx * x / (z + 1e-5) + px, -1., 1.)
-  y_ndc = np.clip(-fy * y / (z + 1e-5) + py, -1., 1.)
+  x_ndc = np.clip(-fx * x / (z+1e-5) + px, -1., 1.)
+  y_ndc = np.clip(-fy * y / (z+1e-5) + py, -1., 1.)
   # Convert from NDC space to image space.
-  x_im = np.int32((1 + x_ndc) * 0.5 * image_cols)
-  y_im = np.int32((1 - y_ndc) * 0.5 * image_rows)
+  x_im = np.int32((1+x_ndc) * 0.5 * image_cols)
+  y_im = np.int32((1-y_ndc) * 0.5 * image_rows)
   # Draw xyz axis on the image.
   origin = (x_im[0], y_im[0])
   x_axis = (x_im[1], y_im[1])
   y_axis = (x_im[2], y_im[2])
   z_axis = (x_im[3], y_im[3])
-  cv2.arrowedLine(image, origin, x_axis, RED_COLOR,
-                  axis_drawing_spec.thickness)
+  cv2.arrowedLine(image, origin, x_axis, RED_COLOR, axis_drawing_spec.thickness)
   cv2.arrowedLine(image, origin, y_axis, GREEN_COLOR,
                   axis_drawing_spec.thickness)
   cv2.arrowedLine(image, origin, z_axis, BLUE_COLOR,
@@ -243,14 +247,15 @@ def _normalize_color(color):
   return tuple(v / 255. for v in color)
 
 
-def plot_landmarks(landmark_list: landmark_pb2.NormalizedLandmarkList,
-                   connections: Optional[List[Tuple[int, int]]] = None,
-                   landmark_drawing_spec: DrawingSpec = DrawingSpec(
-                       color=RED_COLOR, thickness=5),
-                   connection_drawing_spec: DrawingSpec = DrawingSpec(
-                       color=BLACK_COLOR, thickness=5),
-                   elevation: int = 10,
-                   azimuth: int = 10):
+def plot_landmarks(
+    landmark_list: landmark_pb2.NormalizedLandmarkList,
+    connections: Optional[List[Tuple[int, int]]] = None,
+    landmark_drawing_spec: DrawingSpec = DrawingSpec(color=RED_COLOR,
+                                                     thickness=5),
+    connection_drawing_spec: DrawingSpec = DrawingSpec(color=BLACK_COLOR,
+                                                       thickness=5),
+    elevation: int = 10,
+    azimuth: int = 10):
   """Plot the landmarks and the connections in matplotlib 3d.
 
   Args:
@@ -278,12 +283,11 @@ def plot_landmarks(landmark_list: landmark_pb2.NormalizedLandmarkList,
         (landmark.HasField('presence') and
          landmark.presence < PRESENCE_THRESHOLD)):
       continue
-    ax.scatter3D(
-        xs=[-landmark.z],
-        ys=[landmark.x],
-        zs=[-landmark.y],
-        color=_normalize_color(landmark_drawing_spec.color[::-1]),
-        linewidth=landmark_drawing_spec.thickness)
+    ax.scatter3D(xs=[-landmark.z],
+                 ys=[landmark.x],
+                 zs=[-landmark.y],
+                 color=_normalize_color(landmark_drawing_spec.color[::-1]),
+                 linewidth=landmark_drawing_spec.thickness)
     plotted_landmarks[idx] = (-landmark.z, landmark.x, -landmark.y)
   if connections:
     num_landmarks = len(landmark_list.landmark)
@@ -298,10 +302,9 @@ def plot_landmarks(landmark_list: landmark_pb2.NormalizedLandmarkList,
         landmark_pair = [
             plotted_landmarks[start_idx], plotted_landmarks[end_idx]
         ]
-        ax.plot3D(
-            xs=[landmark_pair[0][0], landmark_pair[1][0]],
-            ys=[landmark_pair[0][1], landmark_pair[1][1]],
-            zs=[landmark_pair[0][2], landmark_pair[1][2]],
-            color=_normalize_color(connection_drawing_spec.color[::-1]),
-            linewidth=connection_drawing_spec.thickness)
+        ax.plot3D(xs=[landmark_pair[0][0], landmark_pair[1][0]],
+                  ys=[landmark_pair[0][1], landmark_pair[1][1]],
+                  zs=[landmark_pair[0][2], landmark_pair[1][2]],
+                  color=_normalize_color(connection_drawing_spec.color[::-1]),
+                  linewidth=connection_drawing_spec.thickness)
   plt.show()
