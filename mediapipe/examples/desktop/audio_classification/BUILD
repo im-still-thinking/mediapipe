@@ -21,7 +21,7 @@ cc_binary(
     name = "audio_classification_cpu",
     deps = [
         "//mediapipe/examples/desktop:audio_run_graph_main",
-        "//mediapipe/graphs/audio_classification/calculators:tflite_task_audio_classifier_calculator",
+        "//mediapipe/graphs/audio_classification:audio_classification_desktop_live",
     ],
 )
 

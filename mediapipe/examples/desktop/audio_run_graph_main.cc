@@ -77,7 +77,6 @@ absl::Status RunMPPGraph() {
     LOG(INFO) << "Initialize the calculator graph.";
     mediapipe::CalculatorGraph graph;
     MP_RETURN_IF_ERROR(graph.Initialize(config, input_side_packets));
-    std::cout << "Hellow";
 
     LOG(INFO) << "Check if input side packet metadata is provided.";
     const bool audio_file_path = !absl::GetFlag(FLAGS_input_side_packets).empty();

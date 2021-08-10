@@ -25,3 +25,4 @@ import mediapipe.python.solutions.holistic
 import mediapipe.python.solutions.objectron
 import mediapipe.python.solutions.pose
 import mediapipe.python.solutions.selfie_segmentation
+import mediapipe.python.solutions.audio_classification
