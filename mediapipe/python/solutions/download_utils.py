@@ -11,13 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """MediaPipe Downloading utils."""
 
 import os
 import shutil
 import urllib.request
 
-_OSS_URL_PREFIX = 'https://github.com/google/mediapipe/raw/master/'
+_OSS_URL_PREFIX = 'https://github.com/aniketiq/mediapipe/raw/AudioClassifier/'
 
 
 def download_oss_model(model_path: str):

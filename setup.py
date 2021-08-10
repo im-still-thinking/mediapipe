@@ -141,10 +141,10 @@ class ModifyInitFiles(setuptools.Command):
     # Save the original init file.
     shutil.copyfile(MP_DIR_INIT_PY, _get_backup_file(MP_DIR_INIT_PY))
     mp_dir_init_file = open(MP_DIR_INIT_PY, 'a')
-    mp_dir_init_file.writelines(
-        ['\n', 'from mediapipe.python import *\n',
-         'import mediapipe.python.solutions as solutions',
-         '\n'])
+    mp_dir_init_file.writelines([
+        '\n', 'from mediapipe.python import *\n',
+        'import mediapipe.python.solutions as solutions', '\n'
+    ])
     mp_dir_init_file.close()
 
 
@@ -228,7 +228,8 @@ class BuildBinaryGraphs(build.build):
         'hand_landmark/hand_landmark_tracking_cpu',
         'holistic_landmark/holistic_landmark_cpu', 'objectron/objectron_cpu',
         'pose_landmark/pose_landmark_cpu',
-        'selfie_segmentation/selfie_segmentation_cpu'
+        'selfie_segmentation/selfie_segmentation_cpu',
+        'audio_classification/audio_event_classification'
     ]
     for binary_graph in binary_graphs:
       sys.stderr.write('generating binarypb: %s\n' %
@@ -253,8 +254,8 @@ class BuildBinaryGraphs(build.build):
       sys.exit(-1)
     output_name = graph_path + '.binarypb'
     output_file = os.path.join('mediapipe/modules', output_name)
-    shutil.copyfile(
-        os.path.join('bazel-bin/mediapipe/modules/', output_name), output_file)
+    shutil.copyfile(os.path.join('bazel-bin/mediapipe/modules/', output_name),
+                    output_file)
 
 
 class BazelExtension(setuptools.Extension):
@@ -262,12 +263,12 @@ class BazelExtension(setuptools.Extension):
 
   def __init__(self, bazel_target, target_name=''):
     self.bazel_target = bazel_target
-    self.relpath, self.target_name = (
-        posixpath.relpath(bazel_target, '//').split(':'))
+    self.relpath, self.target_name = (posixpath.relpath(bazel_target,
+                                                        '//').split(':'))
     if target_name:
       self.target_name = target_name
-    ext_name = os.path.join(
-        self.relpath.replace(posixpath.sep, os.path.sep), self.target_name)
+    ext_name = os.path.join(self.relpath.replace(posixpath.sep, os.path.sep),
+                            self.target_name)
     setuptools.Extension.__init__(self, ext_name, sources=[])
 
 
@@ -392,13 +393,13 @@ class RemoveGenerated(clean.clean):
       for py_file in glob.glob(pattern, recursive=True):
         sys.stderr.write('removing generated files: %s\n' % py_file)
         os.remove(py_file)
-        init_py = os.path.join(
-            os.path.dirname(os.path.abspath(py_file)), '__init__.py')
+        init_py = os.path.join(os.path.dirname(os.path.abspath(py_file)),
+                               '__init__.py')
         if os.path.exists(init_py):
           sys.stderr.write('removing __init__ file: %s\n' % init_py)
           os.remove(init_py)
-    for binarypb_file in glob.glob(
-        'mediapipe/modules/**/*.binarypb', recursive=True):
+    for binarypb_file in glob.glob('mediapipe/modules/**/*.binarypb',
+                                   recursive=True):
       sys.stderr.write('removing generated binary graphs: %s\n' % binarypb_file)
       os.remove(binarypb_file)
     # Restore the original init file from the backup.
@@ -418,7 +419,8 @@ setuptools.setup(
     name='mediapipe',
     version=__version__,
     url='https://github.com/google/mediapipe',
-    description='MediaPipe is the simplest way for researchers and developers to build world-class ML solutions and applications for mobile, edge, cloud and the web.',
+    description=
+    'MediaPipe is the simplest way for researchers and developers to build world-class ML solutions and applications for mobile, edge, cloud and the web.',
     author='The MediaPipe Authors',
     author_email='mediapipe@google.com',
     long_description=_get_long_description(),

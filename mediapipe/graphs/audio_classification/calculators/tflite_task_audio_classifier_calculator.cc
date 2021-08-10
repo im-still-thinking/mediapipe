@@ -15,7 +15,15 @@ limitations under the License.
 #include <limits>
 
 #include "mediapipe/framework/calculator_framework.h"
-#include "tensorflow_lite_support/examples/task/audio/desktop/audio_classifier_lib.h"
+#include "mediapipe/graphs/audio_classification/calculators/helper/audio_classifier_lib.h"
+
+// #include "tensorflow_lite_support/cc/port/status_macros.h"
+// #include "tensorflow_lite_support/cc/port/statusor.h"
+// #include "tensorflow_lite_support/cc/task/audio/audio_classifier.h"
+// #include "tensorflow_lite_support/cc/task/audio/core/audio_buffer.h"
+// #include "tensorflow_lite_support/cc/task/audio/proto/classifications_proto_inc.h"
+// #include "tensorflow_lite_support/cc/task/core/category.h"
+// #include "tensorflow_lite_support/examples/task/audio/desktop/wav/wav_io.h"
 
 namespace mediapipe {
 
@@ -56,6 +64,7 @@ absl::Status TfliteTaskAudioClassifierCalculator::Open(CalculatorContext* cc) {
         const auto& head = result_.classifications(0);
         const int score = head.classes(0).score();
         const std::string classification = head.classes(0).class_name();
+
         if (score >= min_score_thres) {
             cc->OutputSidePackets().Tag("CLASS").Set(MakePacket<std::string>(classification));
         }

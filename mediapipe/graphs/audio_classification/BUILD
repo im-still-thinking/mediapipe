@@ -22,28 +22,9 @@ licenses(["notice"])
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "desktop_calculators",
+    name = "audio_classification_desktop_live",
     deps = [
-        "//mediapipe/calculators/audio:audio_decoder_calculator",
-        "//mediapipe/calculators/audio:basic_time_series_calculators",
-        "//mediapipe/calculators/audio:mfcc_mel_calculators",
-        "//mediapipe/calculators/core:add_header_calculator",
-        "//mediapipe/calculators/audio:rational_factor_resample_calculator",
-        "//mediapipe/calculators/audio:spectrogram_calculator",
-        "//mediapipe/calculators/audio:stabilized_log_calculator",
-        "//mediapipe/calculators/audio:time_series_framer_calculator",
-        "//mediapipe/calculators/tensor:inference_calculator",
-        "//mediapipe/calculators/tensor:tensors_to_floats_calculator",
-        "//mediapipe/calculators/tensorflow:matrix_to_tensor_calculator",
-        "//mediapipe/calculators/tensorflow:unpack_media_sequence_calculator",
-        "//mediapipe/calculators/tensorflow:string_to_sequence_example_calculator",
-        "//mediapipe/calculators/tensorflow:tensorflow_inference_calculator",
-        "//mediapipe/calculators/tensorflow:tensor_to_vector_float_calculator",
-        "//mediapipe/calculators/tensorflow:tensorflow_session_from_saved_model_calculator",
-        "//mediapipe/calculators/tflite:tflite_inference_calculator",
-        "//mediapipe/calculators/tflite:tflite_converter_calculator",
-        "//mediapipe/calculators/tflite:tflite_tensors_to_floats_calculator",
-        "//mediapipe/calculators/util:top_k_scores_calculator",       
+        "//mediapipe/graphs/audio_classification/calculators:tflite_task_audio_classifier_calculator",
     ],
 )
 

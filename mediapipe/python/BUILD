@@ -74,5 +74,6 @@ cc_library(
         "//mediapipe/modules/pose_landmark:pose_landmark_by_roi_cpu",
         "//mediapipe/modules/pose_landmark:pose_landmark_cpu",
         "//mediapipe/modules/selfie_segmentation:selfie_segmentation_cpu",
+        "//mediapipe/modules/audio_classification:audio_event_classification",
     ],
 )
