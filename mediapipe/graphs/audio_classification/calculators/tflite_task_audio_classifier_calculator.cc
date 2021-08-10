@@ -58,7 +58,7 @@ absl::Status TfliteTaskAudioClassifierCalculator::Open(CalculatorContext* cc) {
     const int min_score_thres = 0.5;
     //Start Classification
     auto result = tflite::task::audio::Classify(
-        yamnet_model_path, input_file_path, false);   //False for Coral Edge TPU not connected
+        yamnet_model_path, input_file_path);
     if (result.ok()) {
         const tflite::task::audio::ClassificationResult& result_ = result.value();
         const auto& head = result_.classifications(0);

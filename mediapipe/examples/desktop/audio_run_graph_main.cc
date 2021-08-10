@@ -92,7 +92,7 @@ absl::Status RunMPPGraph() {
     ASSIGN_OR_RETURN(auto status_or_packet, graph.GetOutputSidePacket(kOutput));
     std::ofstream file;
     file.open(absl::GetFlag(FLAGS_output_stream_file));
-    file << absl::StrCat("Result:", status_or_packet.Get<std::string>(), "\n");
+    file << absl::StrCat("", status_or_packet.Get<std::string>(), "\n");
     file.close();
 
     return absl::OkStatus();
