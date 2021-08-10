@@ -33,27 +33,6 @@ namespace tflite {
 namespace task {
 namespace audio {
 
-tflite::support::StatusOr<AudioBuffer> LoadAudioBufferFromFile(
-    const std::string& wav_file, int buffer_size,
-    std::vector<float>* wav_data) {
-    std::string contents = ReadFile(wav_file);
-
-    uint32 decoded_sample_count;
-    uint16 decoded_channel_count;
-    uint32 decoded_sample_rate;
-    RETURN_IF_ERROR(DecodeLin16WaveAsFloatVector(
-        contents, wav_data, &decoded_sample_count, &decoded_channel_count,
-        &decoded_sample_rate));
-
-    if (decoded_sample_count > buffer_size) {
-        decoded_sample_count = buffer_size;
-    }
-
-    return AudioBuffer(
-        wav_data->data(), decoded_sample_count,
-        {decoded_channel_count, static_cast<int>(decoded_sample_rate)});
-}
-
 tflite::support::StatusOr<ClassificationResult> Classify(
     const std::string& model_path, const std::string& wav_file,
     bool use_coral) {
@@ -71,13 +50,50 @@ tflite::support::StatusOr<ClassificationResult> Classify(
 
     // `wav_data` holds data loaded from the file and needs to outlive `buffer`.
     std::vector<float> wav_data;
-    ASSIGN_OR_RETURN(
-        AudioBuffer buffer,
-        LoadAudioBufferFromFile(
-            wav_file, classifier->GetRequiredInputBufferSize(), &wav_data));
+
+    //Load data from wav file
+    std::string contents = ReadFile(wav_file);
+    uint32 decoded_sample_count;
+    uint16 decoded_channel_count;
+    uint32 decoded_sample_rate;
+
+    int buffer_size = classifier->GetRequiredInputBufferSize();
+    RETURN_IF_ERROR(DecodeLin16WaveAsFloatVector(
+        contents, &wav_data, &decoded_sample_count, &decoded_channel_count,
+        &decoded_sample_rate));
+
+    std::cout << "decoded_sample_count: " << decoded_sample_count << std::endl;
+
+    std::cout << "buffer_size: " << buffer_size << std::endl;
+    std::vector<AudioBuffer> buffer_array;
+
+    std::vector<float>::iterator it = wav_data.begin();
+
+    while (it != wav_data.end()) {
+        std::vector<float> sliced_wav_data;
+
+        if (it + buffer_size > wav_data.end()) {
+            sliced_wav_data.assign(it, wav_data.end());
+            it = wav_data.end();
+        } else {
+            sliced_wav_data.assign(it, it + buffer_size);
+            it += buffer_size;
+        }
+
+        AudioBuffer buffer = AudioBuffer(
+            sliced_wav_data.data(), buffer_size,
+            {decoded_channel_count, static_cast<int>(decoded_sample_rate)});
+
+        buffer_array.push_back(buffer);
+    }
 
     auto start_classify = std::chrono::steady_clock::now();
-    ASSIGN_OR_RETURN(ClassificationResult result, classifier->Classify(buffer));
+    std::vector<ClassificationResult> results;
+    for (auto buff : buffer_array) {
+        ASSIGN_OR_RETURN(ClassificationResult result, classifier->Classify(buff));
+        results.push_back(result);
+    }
+
     auto end_classify = std::chrono::steady_clock::now();
     std::string delegate = use_coral ? "Coral Edge TPU" : "CPU";
     const auto duration_ms =
@@ -85,7 +101,7 @@ tflite::support::StatusOr<ClassificationResult> Classify(
     std::cout << "Time cost to classify the input audio clip on " << delegate
               << ": " << duration_ms.count() << " ms" << std::endl;
 
-    return result;
+    return results[0];
 }
 
 }   // namespace audio
