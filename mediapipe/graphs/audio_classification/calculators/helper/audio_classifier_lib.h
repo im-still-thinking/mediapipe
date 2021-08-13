@@ -27,7 +27,7 @@ namespace audio {
 // in `model_path` with default options. If the content of `wav_file` is longer
 // than what the model requires, only the beginning section is used for
 // inference.
-tflite::support::StatusOr<ClassificationResult> Classify(
+tflite::support::StatusOr<std::vector<std::string>> Classify(
     const std::string& model_path, const std::string& wav_file,
     bool use_coral = false);
 

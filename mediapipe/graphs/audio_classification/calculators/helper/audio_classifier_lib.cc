@@ -33,7 +33,7 @@ namespace tflite {
 namespace task {
 namespace audio {
 
-tflite::support::StatusOr<ClassificationResult> Classify(
+tflite::support::StatusOr<std::vector<std::string>> Classify(
     const std::string& model_path, const std::string& wav_file,
     bool use_coral) {
     AudioClassifierOptions options;
@@ -87,21 +87,17 @@ tflite::support::StatusOr<ClassificationResult> Classify(
         buffer_array.push_back(buffer);
     }
 
-    auto start_classify = std::chrono::steady_clock::now();
-    std::vector<ClassificationResult> results;
+    std::vector<std::string> results;
     for (auto buff : buffer_array) {
         ASSIGN_OR_RETURN(ClassificationResult result, classifier->Classify(buff));
-        results.push_back(result);
+        const auto& head = result.classifications(0);
+        const int score = head.classes(0).score();
+        const std::string classification = head.classes(0).class_name();
+
+        results.push_back(classification);
     }
 
-    auto end_classify = std::chrono::steady_clock::now();
-    std::string delegate = use_coral ? "Coral Edge TPU" : "CPU";
-    const auto duration_ms =
-        std::chrono::duration<float, std::milli>(end_classify - start_classify);
-    std::cout << "Time cost to classify the input audio clip on " << delegate
-              << ": " << duration_ms.count() << " ms" << std::endl;
-
-    return results[0];
+    return results;
 }
 
 }   // namespace audio

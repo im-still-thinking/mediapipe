@@ -1,3 +1,45 @@
+ diff --git a/tensorflow_lite_support/cc/port/BUILD b/tensorflow_lite_support/cc/port/BUILD
+index a6cea04..244d316 100644
+--- a/tensorflow_lite_support/cc/port/BUILD
++++ b/tensorflow_lite_support/cc/port/BUILD
+@@ -1,7 +1,9 @@
+ load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite")
+ 
+ package(
+-    default_visibility = ["//tensorflow_lite_support:users"],
++    default_visibility = [
++        "//visibility:public",
++    ],
+     licenses = ["notice"],  # Apache 2.0
+ )
+ 
+diff --git a/tensorflow_lite_support/cc/task/core/BUILD b/tensorflow_lite_support/cc/task/core/BUILD
+index 12b921a..e4c26e0 100644
+--- a/tensorflow_lite_support/cc/task/core/BUILD
++++ b/tensorflow_lite_support/cc/task/core/BUILD
+@@ -1,7 +1,9 @@
+ load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite")
+ 
+ package(
+-    default_visibility = ["//tensorflow_lite_support:users"],
++    default_visibility = [
++        "//visibility:public",
++    ],
+     licenses = ["notice"],  # Apache 2.0
+ )
+ 
+diff --git a/tensorflow_lite_support/examples/task/BUILD b/tensorflow_lite_support/examples/task/BUILD
+index 53a6b0c..36f7b47 100644
+--- a/tensorflow_lite_support/examples/task/BUILD
++++ b/tensorflow_lite_support/examples/task/BUILD
+@@ -1,6 +1,6 @@
+ package(
+     default_visibility = [
+-        "//tensorflow_lite_support:users",
++        "//visibility:public",
+     ],
+     licenses = ["notice"],  # Apache 2.0
+ )
 diff --git a/tensorflow_lite_support/examples/task/audio/desktop/BUILD b/tensorflow_lite_support/examples/task/audio/desktop/BUILD
 index 7c4840f..d4dc2e8 100644
 --- a/tensorflow_lite_support/examples/task/audio/desktop/BUILD
@@ -10,4 +52,16 @@ index 7c4840f..d4dc2e8 100644
      ],
      licenses = ["notice"],  # Apache 2.0
  )
+diff --git a/tensorflow_lite_support/examples/task/audio/desktop/wav/BUILD b/tensorflow_lite_support/examples/task/audio/desktop/wav/BUILD
+index 9c1f6c0..0238128 100644
+--- a/tensorflow_lite_support/examples/task/audio/desktop/wav/BUILD
++++ b/tensorflow_lite_support/examples/task/audio/desktop/wav/BUILD
+@@ -3,7 +3,7 @@
  
+ package(
+     default_visibility = [
+-        "//tensorflow_lite_support:users",
++        "//visibility:public",
+     ],
+     licenses = ["notice"],  # Apache 2.0
+ )

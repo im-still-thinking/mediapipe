@@ -25,8 +25,6 @@ cc_library(
         "//mediapipe/graphs/audio_classification/calculators/helper:audio_classifier_lib",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings:str_format",
-        # "@org_tensorflow_lite_support//tensorflow_lite_support/examples/task/audio/desktop:audio_classifier_lib",
-        # "@org_tensorflow_lite_support//tensorflow_lite_support/cc/task/audio:audio_classifier",
     ],
     alwayslink = 1,
 )

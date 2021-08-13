@@ -17,14 +17,6 @@ limitations under the License.
 #include "mediapipe/framework/calculator_framework.h"
 #include "mediapipe/graphs/audio_classification/calculators/helper/audio_classifier_lib.h"
 
-// #include "tensorflow_lite_support/cc/port/status_macros.h"
-// #include "tensorflow_lite_support/cc/port/statusor.h"
-// #include "tensorflow_lite_support/cc/task/audio/audio_classifier.h"
-// #include "tensorflow_lite_support/cc/task/audio/core/audio_buffer.h"
-// #include "tensorflow_lite_support/cc/task/audio/proto/classifications_proto_inc.h"
-// #include "tensorflow_lite_support/cc/task/core/category.h"
-// #include "tensorflow_lite_support/examples/task/audio/desktop/wav/wav_io.h"
-
 namespace mediapipe {
 
 class TfliteTaskAudioClassifierCalculator : public CalculatorBase {
@@ -44,7 +36,7 @@ absl::Status TfliteTaskAudioClassifierCalculator::GetContract(CalculatorContract
     RET_CHECK(!cc->InputSidePackets().GetTags().empty());
     cc->InputSidePackets().Tag("MODEL_PATH").Set<std::string>();
     cc->InputSidePackets().Tag("DATA_PATH").Set<std::string>();
-    cc->OutputSidePackets().Tag("CLASS").Set<std::string>();
+    cc->OutputSidePackets().Tag("CLASS").Set<std::vector<std::string>>();
 
     return absl::OkStatus();
 }
@@ -55,19 +47,15 @@ absl::Status TfliteTaskAudioClassifierCalculator::Open(CalculatorContext* cc) {
     const std::string& yamnet_model_path =
         cc->InputSidePackets().Tag("MODEL_PATH").Get<std::string>();
 
-    const int min_score_thres = 0.5;
+    // const int min_score_thres = 0.5;
+
     //Start Classification
-    auto result = tflite::task::audio::Classify(
+    tflite::support::StatusOr<std::vector<std::string>> result = tflite::task::audio::Classify(
         yamnet_model_path, input_file_path);
     if (result.ok()) {
-        const tflite::task::audio::ClassificationResult& result_ = result.value();
-        const auto& head = result_.classifications(0);
-        const int score = head.classes(0).score();
-        const std::string classification = head.classes(0).class_name();
+        auto result_ = result.value();
+        cc->OutputSidePackets().Tag("CLASS").Set(MakePacket<std::vector<std::string>>(result_));
 
-        if (score >= min_score_thres) {
-            cc->OutputSidePackets().Tag("CLASS").Set(MakePacket<std::string>(classification));
-        }
     } else {
         std::cerr << "Classification failed: " << result.status().message() << "\n";
     }
