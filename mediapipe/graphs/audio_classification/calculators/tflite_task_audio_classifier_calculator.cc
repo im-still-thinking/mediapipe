@@ -14,7 +14,9 @@ limitations under the License.
 #include <iostream>
 #include <limits>
 
+#include "Eigen/Core"
 #include "mediapipe/framework/calculator_framework.h"
+#include "mediapipe/framework/formats/matrix.h"
 #include "mediapipe/graphs/audio_classification/calculators/helper/audio_classifier_lib.h"
 
 namespace mediapipe {
@@ -35,23 +37,23 @@ REGISTER_CALCULATOR(TfliteTaskAudioClassifierCalculator);
 absl::Status TfliteTaskAudioClassifierCalculator::GetContract(CalculatorContract* cc) {
     RET_CHECK(!cc->InputSidePackets().GetTags().empty());
     cc->InputSidePackets().Tag("MODEL_PATH").Set<std::string>();
-    cc->InputSidePackets().Tag("DATA_PATH").Set<std::string>();
+    cc->Inputs().Tag("DATA").Set<Matrix>();
     cc->OutputSidePackets().Tag("CLASS").Set<std::vector<std::string>>();
 
     return absl::OkStatus();
 }
 
 absl::Status TfliteTaskAudioClassifierCalculator::Open(CalculatorContext* cc) {
-    const std::string& input_file_path =
-        cc->InputSidePackets().Tag("DATA_PATH").Get<std::string>();
+    const Matrix& input_file =
+        cc->Inputs().Tag("DATA").Get<Matrix>();
     const std::string& yamnet_model_path =
         cc->InputSidePackets().Tag("MODEL_PATH").Get<std::string>();
 
     // const int min_score_thres = 0.5;
 
     //Start Classification
-    tflite::support::StatusOr<std::vector<std::string>> result = tflite::task::audio::Classify(
-        yamnet_model_path, input_file_path);
+    tflite::support::StatusOr<std::vector<std::string>> result = tflite::task::audio::Classify_(
+        yamnet_model_path, input_file);
     if (result.ok()) {
         auto result_ = result.value();
         cc->OutputSidePackets().Tag("CLASS").Set(MakePacket<std::vector<std::string>>(result_));

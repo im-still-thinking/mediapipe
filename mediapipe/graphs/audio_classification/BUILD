@@ -24,6 +24,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "audio_classification_desktop_live",
     deps = [
+        "//mediapipe/calculators/audio:audio_decoder_calculator",
+        "//mediapipe/calculators/core:add_header_calculator",
+        "//mediapipe/calculators/audio:basic_time_series_calculators",
+        "//mediapipe/calculators/audio:rational_factor_resample_calculator",
         "//mediapipe/graphs/audio_classification/calculators:tflite_task_audio_classifier_calculator",
     ],
 )

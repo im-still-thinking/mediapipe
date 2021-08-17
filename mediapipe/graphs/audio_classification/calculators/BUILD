@@ -22,6 +22,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:matrix",
         "//mediapipe/graphs/audio_classification/calculators/helper:audio_classifier_lib",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings:str_format",

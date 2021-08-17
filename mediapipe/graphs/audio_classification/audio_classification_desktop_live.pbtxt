@@ -3,8 +3,47 @@ input_side_packet: "input_audio_wav_path"
 output_side_packet: "audio_class"
 
 node {
+  calculator: "AudioDecoderCalculator"
+  input_side_packet: "INPUT_FILE_PATH:input_audio_wav_path"
+  output_stream: "AUDIO:audio"
+  output_stream: "AUDIO_HEADER:audio_header"
+  node_options: {
+    [type.googleapis.com/mediapipe.AudioDecoderOptions] {
+      audio_stream { 
+        stream_index: 0 
+      }
+    }
+  }
+}
+
+node {
+  calculator: "AddHeaderCalculator"
+  input_stream: "DATA:audio"
+  input_stream: "HEADER:audio_header"
+  output_stream: "media_audio"
+}
+
+# Always convert the audio to mono.
+node {
+  calculator: "AverageTimeSeriesAcrossChannelsCalculator"
+  input_stream: "media_audio"
+  output_stream: "mono_waveform"
+}
+
+node {
+  calculator: "RationalFactorResampleCalculator"
+  input_stream: "mono_waveform"
+  output_stream: "resampled_waveform"
+  node_options: {
+    [type.googleapis.com/mediapipe.RationalFactorResampleCalculatorOptions] {
+      target_sample_rate: 16000.0
+    }
+  }
+}
+
+node {
   calculator: "TfliteTaskAudioClassifierCalculator"
+  input_stream: "DATA:resampled_waveform"
   input_side_packet: "MODEL_PATH:yamnet_model_path"
-  input_side_packet: "DATA_PATH:input_audio_wav_path"
   output_side_packet: "CLASS:audio_class"
 }

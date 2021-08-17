@@ -15,6 +15,9 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_SUPPORT_EXAMPLES_TASK_AUDIO_DESKTOP_AUDIO_CLASSIFIER_LIB_H_
 #define TENSORFLOW_LITE_SUPPORT_EXAMPLES_TASK_AUDIO_DESKTOP_AUDIO_CLASSIFIER_LIB_H_
 
+#include "Eigen/Core"
+
+#include "mediapipe/framework/formats/matrix.h"
 #include "tensorflow_lite_support/cc/port/statusor.h"
 #include "tensorflow_lite_support/cc/task/audio/core/audio_buffer.h"
 #include "tensorflow_lite_support/cc/task/audio/proto/classifications_proto_inc.h"
@@ -30,6 +33,9 @@ namespace audio {
 tflite::support::StatusOr<std::vector<std::string>> Classify(
     const std::string& model_path, const std::string& wav_file,
     bool use_coral = false);
+
+tflite::support::StatusOr<std::vector<std::string>> Classify_(
+    const std::string& model_path, const mediapipe::Matrix& audio_data);
 
 }   // namespace audio
 }   // namespace task

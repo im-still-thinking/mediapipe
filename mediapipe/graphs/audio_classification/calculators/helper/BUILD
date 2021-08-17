@@ -21,6 +21,7 @@ cc_library(
     srcs = ["audio_classifier_lib.cc"],
     hdrs = ["audio_classifier_lib.h"],
     deps = [
+        "//mediapipe/framework/formats:matrix",
         "//mediapipe/graphs/audio_classification/calculators/helper/wav:wav_io",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings:str_format",

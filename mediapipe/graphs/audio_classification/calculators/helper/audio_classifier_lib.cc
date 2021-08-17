@@ -33,34 +33,99 @@ namespace tflite {
 namespace task {
 namespace audio {
 
-tflite::support::StatusOr<std::vector<std::string>> Classify(
-    const std::string& model_path, const std::string& wav_file,
-    bool use_coral) {
+// tflite::support::StatusOr<std::vector<std::string>> Classify(
+//     const std::string& model_path, const std::string& wav_file,
+//     bool use_coral) {
+//     AudioClassifierOptions options;
+//     options.mutable_base_options()->mutable_model_file()->set_file_name(
+//         model_path);
+//     if (use_coral) {
+//         options.mutable_base_options()
+//             ->mutable_compute_settings()
+//             ->mutable_tflite_settings()
+//             ->set_delegate(::tflite::proto::Delegate::EDGETPU_CORAL);
+//     }
+//     ASSIGN_OR_RETURN(std::unique_ptr<AudioClassifier> classifier,
+//                      AudioClassifier::CreateFromOptions(options));
+
+//     // `wav_data` holds data loaded from the file and needs to outlive `buffer`.
+//     std::vector<float> wav_data;
+
+//     //Load data from wav file
+//     std::string contents = ReadFile(wav_file);
+//     uint32 decoded_sample_count;
+//     uint16 decoded_channel_count;
+//     uint32 decoded_sample_rate;
+
+//     int buffer_size = classifier->GetRequiredInputBufferSize();
+//     RETURN_IF_ERROR(DecodeLin16WaveAsFloatVector(
+//         contents, &wav_data, &decoded_sample_count, &decoded_channel_count,
+//         &decoded_sample_rate));
+
+//     std::cout << "decoded_sample_count: " << decoded_sample_count << std::endl;
+
+//     std::cout << "buffer_size: " << buffer_size << std::endl;
+//     std::vector<AudioBuffer> buffer_array;
+
+//     std::vector<float>::iterator it = wav_data.begin();
+
+//     while (it != wav_data.end()) {
+//         std::vector<float> sliced_wav_data;
+
+//         if (it + buffer_size > wav_data.end()) {
+//             sliced_wav_data.assign(it, wav_data.end());
+//             it = wav_data.end();
+//         } else {
+//             sliced_wav_data.assign(it, it + buffer_size);
+//             it += buffer_size;
+//         }
+
+//         AudioBuffer buffer = AudioBuffer(
+//             sliced_wav_data.data(), buffer_size,
+//             {decoded_channel_count, static_cast<int>(decoded_sample_rate)});
+
+//         buffer_array.push_back(buffer);
+//     }
+
+//     std::vector<std::string> results;
+//     for (auto buff : buffer_array) {
+//         ASSIGN_OR_RETURN(ClassificationResult result, classifier->Classify(buff));
+//         const auto& head = result.classifications(0);
+//         const int score = head.classes(0).score();
+//         const std::string classification = head.classes(0).class_name();
+
+//         results.push_back(classification);
+//     }
+
+//     return results;
+// }
+
+tflite::support::StatusOr<std::vector<std::string>> Classify_(
+    const std::string& model_path, const mediapipe::Matrix& audio_data) {
+
     AudioClassifierOptions options;
     options.mutable_base_options()->mutable_model_file()->set_file_name(
         model_path);
-    if (use_coral) {
-        options.mutable_base_options()
-            ->mutable_compute_settings()
-            ->mutable_tflite_settings()
-            ->set_delegate(::tflite::proto::Delegate::EDGETPU_CORAL);
-    }
+
     ASSIGN_OR_RETURN(std::unique_ptr<AudioClassifier> classifier,
                      AudioClassifier::CreateFromOptions(options));
 
     // `wav_data` holds data loaded from the file and needs to outlive `buffer`.
     std::vector<float> wav_data;
 
+    wav_data.resize(audio_data.cols());
+    Eigen::Map<Eigen::ArrayXf>(wav_data.data(), wav_data.size()) = audio_data.row(0);
+
     //Load data from wav file
-    std::string contents = ReadFile(wav_file);
-    uint32 decoded_sample_count;
-    uint16 decoded_channel_count;
-    uint32 decoded_sample_rate;
+    // std::string contents = ReadFile(wav_file);
+    uint32 decoded_sample_count = wav_data.size();
+    uint16 decoded_channel_count = 1;
+    uint32 decoded_sample_rate = 16000;
 
     int buffer_size = classifier->GetRequiredInputBufferSize();
-    RETURN_IF_ERROR(DecodeLin16WaveAsFloatVector(
-        contents, &wav_data, &decoded_sample_count, &decoded_channel_count,
-        &decoded_sample_rate));
+    // RETURN_IF_ERROR(DecodeLin16WaveAsFloatVector(
+    //     contents, &wav_data, &decoded_sample_count, &decoded_channel_count,
+    //     &decoded_sample_rate));
 
     std::cout << "decoded_sample_count: " << decoded_sample_count << std::endl;
 
