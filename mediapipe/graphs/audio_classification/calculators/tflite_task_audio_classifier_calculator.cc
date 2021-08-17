@@ -24,12 +24,14 @@ namespace mediapipe {
 class TfliteTaskAudioClassifierCalculator : public CalculatorBase {
   public:
     TfliteTaskAudioClassifierCalculator() = default;
-
     static absl::Status GetContract(CalculatorContract* cc);
-    absl::Status Open(CalculatorContext* cc) override;
-    absl::Status Process(CalculatorContext* cc) override {
-        return mediapipe::tool::StatusStop();
+    absl::Status Open(CalculatorContext* cc) override {
+        return absl::OkStatus();
     }
+    absl::Status Process(CalculatorContext* cc) override;
+    absl::Status Close(CalculatorContext* cc) override {
+        return absl::OkStatus();
+    };
 };
 
 REGISTER_CALCULATOR(TfliteTaskAudioClassifierCalculator);
@@ -38,12 +40,12 @@ absl::Status TfliteTaskAudioClassifierCalculator::GetContract(CalculatorContract
     RET_CHECK(!cc->InputSidePackets().GetTags().empty());
     cc->InputSidePackets().Tag("MODEL_PATH").Set<std::string>();
     cc->Inputs().Tag("DATA").Set<Matrix>();
-    cc->OutputSidePackets().Tag("CLASS").Set<std::vector<std::string>>();
+    cc->Outputs().Tag("CLASS").Set<std::string>();
 
     return absl::OkStatus();
 }
 
-absl::Status TfliteTaskAudioClassifierCalculator::Open(CalculatorContext* cc) {
+absl::Status TfliteTaskAudioClassifierCalculator::Process(CalculatorContext* cc) {
     const Matrix& input_file =
         cc->Inputs().Tag("DATA").Get<Matrix>();
     const std::string& yamnet_model_path =
@@ -52,15 +54,17 @@ absl::Status TfliteTaskAudioClassifierCalculator::Open(CalculatorContext* cc) {
     // const int min_score_thres = 0.5;
 
     //Start Classification
-    tflite::support::StatusOr<std::vector<std::string>> result = tflite::task::audio::Classify_(
+    tflite::support::StatusOr<std::string> result = tflite::task::audio::Classify_(
         yamnet_model_path, input_file);
     if (result.ok()) {
         auto result_ = result.value();
-        cc->OutputSidePackets().Tag("CLASS").Set(MakePacket<std::vector<std::string>>(result_));
+        cc->Outputs().Tag("CLASS").AddPacket(MakePacket<std::string>(result_)
+                                                 .At(cc->InputTimestamp()));
 
     } else {
         std::cerr << "Classification failed: " << result.status().message() << "\n";
     }
+
     return absl::OkStatus();
 }
 

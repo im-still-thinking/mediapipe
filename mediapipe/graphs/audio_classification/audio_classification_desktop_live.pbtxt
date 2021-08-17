@@ -1,6 +1,6 @@
 input_side_packet: "yamnet_model_path"
 input_side_packet: "input_audio_wav_path"
-output_side_packet: "audio_class"
+output_stream: "audio_class"
 
 node {
   calculator: "AudioDecoderCalculator"
@@ -12,6 +12,8 @@ node {
       audio_stream { 
         stream_index: 0 
       }
+      start_time: 0
+      end_time: 1
     }
   }
 }
@@ -45,5 +47,5 @@ node {
   calculator: "TfliteTaskAudioClassifierCalculator"
   input_stream: "DATA:resampled_waveform"
   input_side_packet: "MODEL_PATH:yamnet_model_path"
-  output_side_packet: "CLASS:audio_class"
+  output_stream: "CLASS:audio_class"
 }

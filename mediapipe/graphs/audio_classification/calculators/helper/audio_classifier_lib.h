@@ -34,7 +34,7 @@ tflite::support::StatusOr<std::vector<std::string>> Classify(
     const std::string& model_path, const std::string& wav_file,
     bool use_coral = false);
 
-tflite::support::StatusOr<std::vector<std::string>> Classify_(
+tflite::support::StatusOr<std::string> Classify_(
     const std::string& model_path, const mediapipe::Matrix& audio_data);
 
 }   // namespace audio
