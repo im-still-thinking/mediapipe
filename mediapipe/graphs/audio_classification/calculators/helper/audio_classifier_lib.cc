@@ -45,7 +45,6 @@ tflite::support::StatusOr<std::string> Classify_(
 
     // `wav_data` holds data loaded from the file and needs to outlive `buffer`.
     std::vector<float> wav_data;
-
     wav_data.resize(audio_data.cols());
     Eigen::Map<Eigen::ArrayXf>(wav_data.data(), wav_data.size()) = audio_data.row(0);
 
@@ -70,8 +69,6 @@ tflite::support::StatusOr<std::string> Classify_(
     const auto& head = result.classifications(0);
     const int score = head.classes(0).score();
     const std::string classification = head.classes(0).class_name();
-
-    std::cout << classification << std::endl;
 
     return classification;
 }

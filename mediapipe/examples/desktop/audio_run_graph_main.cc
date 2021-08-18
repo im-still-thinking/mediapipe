@@ -39,6 +39,19 @@ ABSL_FLAG(std::string, output_stream_file, "",
           "The name of the local file to output all packets sent to "
           "The name of the local file to output all packets. ");
 
+absl::Status OutputStreamToLocalFile(mediapipe::OutputStreamPoller& poller) {
+    std::ofstream file;
+    file.open(absl::GetFlag(FLAGS_output_stream_file));
+    mediapipe::Packet packet;
+    while (poller.Next(&packet)) {
+        std::string output_data;
+        absl::StrAppend(&output_data, packet.Get<std::string>(), "\n");
+        file << output_data;
+    }
+    file.close();
+    return absl::OkStatus();
+}
+
 absl::Status RunMPPGraph() {
     std::string calculator_graph_config_contents;
     MP_RETURN_IF_ERROR(mediapipe::file::GetContents(
@@ -75,16 +88,12 @@ absl::Status RunMPPGraph() {
 
     LOG(INFO) << "Start running the calculator graph.";
 
+    ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller,
+                     graph.AddOutputStreamPoller(kOutput));
     MP_RETURN_IF_ERROR(graph.Run({}));
-    ASSIGN_OR_RETURN(auto poller, graph.AddOutputStreamPoller(kOutput));
-
-    mediapipe::Packet packet;
-    while (poller.Next(&packet)) {
-        std::string output_data;
-        absl::StrAppend(&output_data, packet.Get<std::string>(), "\n");
-        std::cout << output_data << std::endl;
-        }
+    MP_RETURN_IF_ERROR(OutputStreamToLocalFile(poller));
     MP_RETURN_IF_ERROR(graph.WaitUntilDone());
+
     return absl::OkStatus();
 }
 
