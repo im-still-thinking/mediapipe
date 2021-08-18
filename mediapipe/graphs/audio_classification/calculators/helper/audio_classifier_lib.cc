@@ -54,9 +54,6 @@ tflite::support::StatusOr<std::string> Classify_(
 
     int buffer_size = classifier->GetRequiredInputBufferSize();
 
-    // std::cout << "decoded_sample_count: " << decoded_sample_count << std::endl;
-    // std::cout << "buffer_size: " << buffer_size << std::endl;
-
     if (decoded_sample_count > buffer_size) {
         decoded_sample_count = buffer_size;
     }

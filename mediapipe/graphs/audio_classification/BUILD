@@ -27,6 +27,7 @@ cc_library(
         "//mediapipe/calculators/audio:audio_decoder_calculator",
         "//mediapipe/calculators/core:add_header_calculator",
         "//mediapipe/calculators/audio:basic_time_series_calculators",
+        "//mediapipe/calculators/audio:time_series_framer_calculator",
         "//mediapipe/calculators/audio:rational_factor_resample_calculator",
         "//mediapipe/graphs/audio_classification/calculators:tflite_task_audio_classifier_calculator",
     ],

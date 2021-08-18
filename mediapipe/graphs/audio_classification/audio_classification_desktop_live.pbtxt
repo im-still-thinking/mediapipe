@@ -13,7 +13,7 @@ node {
         stream_index: 0 
       }
       start_time: 0
-      end_time: 1
+      end_time: 2
     }
   }
 }
@@ -44,8 +44,20 @@ node {
 }
 
 node {
+  calculator: "TimeSeriesFramerCalculator"
+  input_stream: "resampled_waveform"
+  output_stream: "framed_audio"
+  node_options: {
+    [type.googleapis.com/mediapipe.TimeSeriesFramerCalculatorOptions] {
+      frame_duration_seconds: 0.975
+      frame_overlap_seconds: 0.487
+    }
+  }
+}
+
+node {
   calculator: "TfliteTaskAudioClassifierCalculator"
-  input_stream: "DATA:resampled_waveform"
+  input_stream: "DATA:framed_audio"
   input_side_packet: "MODEL_PATH:yamnet_model_path"
   output_stream: "CLASS:audio_class"
 }
