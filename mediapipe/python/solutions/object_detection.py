@@ -17,6 +17,9 @@ import enum
 from typing import NamedTuple, Union
 
 import numpy as np
+
+sys.path.append('/content/mediapipe')
+
 from mediapipe.framework.formats import detection_pb2
 from mediapipe.framework.formats import location_data_pb2
 # The following imports are needed because python pb2 silently discards
