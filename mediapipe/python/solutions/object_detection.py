@@ -18,6 +18,7 @@ from typing import NamedTuple, Union
 
 import numpy as np
 
+import sys
 sys.path.append('/content/mediapipe')
 
 from mediapipe.framework.formats import detection_pb2
